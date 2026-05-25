@@ -213,4 +213,33 @@ document.addEventListener('DOMContentLoaded', () => {
             eventSource.close();
         };
     });
+
+    // Lightbox Logic
+    const lightboxModal = document.getElementById('lightbox-modal');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.querySelector('.lightbox-close');
+
+    infoImg.addEventListener('click', (e) => {
+        if (e.target.src) {
+            lightboxImg.src = e.target.src;
+            lightboxModal.classList.remove('hidden');
+        }
+    });
+
+    function closeLightbox() {
+        lightboxModal.classList.add('hidden');
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxModal.addEventListener('click', (e) => {
+        if (e.target === lightboxModal) {
+            closeLightbox();
+        }
+    });
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !lightboxModal.classList.contains('hidden')) {
+            closeLightbox();
+        }
+    });
 });
