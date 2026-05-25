@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Demos</title>
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="index.css">
+    
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- DOMPurify -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Glassmorphic Sidebar -->
+        <aside class="sidebar glass-panel">
+            <div class="logo">
+                <div class="logo-icon">A</div>
+                <h2>Agentic Space</h2>
+            </div>
+            
+            <nav>
+                <button class="nav-btn active" data-target="draft-view">
+                    <span class="icon">✍️</span> Draft Content
+                </button>
+                <button class="nav-btn" data-target="summarize-view">
+                    <span class="icon">📊</span> Parallel Summaries
+                </button>
+                <button class="nav-btn" data-target="specialist-view">
+                    <span class="icon">🤖</span> Content Specialist
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>Google ADK & Langchain4j</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- DRAFT CONTENT VIEW -->
+            <section id="draft-view" class="view active">
+                <header>
+                    <h1>Draft & Refine Content</h1>
+                    <p class="subtitle">An agentic pipeline to generate and deslopify text.</p>
+                </header>
+                
+                <div class="input-card glass-panel">
+                    <form id="draft-form">
+                        <div class="input-group">
+                            <label for="topic-input">Enter Topic</label>
+                            <input type="text" id="topic-input" placeholder="e.g. Latest news in AI from March 2026..." required>
+                        </div>
+                        <button type="submit" class="btn primary-btn glow-effect">
+                            Generate <span class="spinner hidden"></span>
+                        </button>
+                    </form>
+                </div>
+                
+                <div id="draft-results" class="results-grid hidden">
+                    <div class="result-card draft-card glass-panel fade-in-up">
+                        <div class="card-header">
+                            <span class="badge red-badge">Original Draft</span>
+                        </div>
+                        <div class="markdown-content" id="draft-content"></div>
+                    </div>
+                    
+                    <div class="result-card refined-card glass-panel fade-in-up" style="animation-delay: 0.2s">
+                        <div class="card-header">
+                            <span class="badge green-badge">Refined (Deslopified)</span>
+                        </div>
+                        <div class="markdown-content" id="refined-content"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PARALLEL SUMMARIZATION VIEW -->
+            <section id="summarize-view" class="view">
+                <header>
+                    <h1>Parallel Summarization</h1>
+                    <p class="subtitle">Evaluates summaries from multiple small models vs one big model.</p>
+                </header>
+                
+                <div class="input-card glass-panel">
+                    <form id="summarize-form">
+                        <div class="input-group">
+                            <label for="article-url">Article URL</label>
+                            <input type="url" id="article-url" placeholder="https://example.com/article" value="https://www.quantamagazine.org/the-ai-revolution-in-math-has-arrived-20260413/" required>
+                        </div>
+                        <button type="submit" class="btn primary-btn glow-effect">
+                            Run Evaluation <span class="spinner hidden"></span>
+                        </button>
+                    </form>
+                </div>
+
+                <div id="summarize-results" class="hidden">
+                    <h3 class="section-title fade-in">Small Model Summaries</h3>
+                    <div class="summaries-grid" id="small-summaries">
+                        <!-- Small summaries injected here -->
+                    </div>
+                    
+                    <div class="comparison-section glass-panel fade-in" id="final-comparison">
+                        <!-- Final comparison injected here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONTENT SPECIALIST VIEW -->
+            <section id="specialist-view" class="view">
+                <header>
+                    <h1>Content Specialist</h1>
+                    <p class="subtitle">Goal-Oriented Planner agent creating infographics.</p>
+                </header>
+                
+                <div class="input-card glass-panel">
+                    <form id="specialist-form">
+                        <div class="input-group">
+                            <label for="specialist-url">Source URL</label>
+                            <input type="url" id="specialist-url" placeholder="https://example.com" value="https://glaforge.dev/posts/2026/04/02/an-adk-java-agent-powered-by-gemma-4/" required>
+                        </div>
+                        <div class="input-group" style="margin-top: 16px;">
+                            <label for="specialist-goal">Target Goal</label>
+                            <select id="specialist-goal" class="custom-select" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white; margin-top: 8px;">
+                                <option value="infographic">🖼️ Infographic Image</option>
+                                <option value="summary">📝 Article Summary</option>
+                                <option value="yt_shorts_script">🎬 YouTube Shorts Script</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn primary-btn glow-effect" id="specialist-btn" style="margin-top: 24px;">
+                            Start Planner <span class="pulse-indicator hidden"></span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="specialist-workspace hidden" id="specialist-workspace">
+                    <div class="terminal-panel glass-panel">
+                        <div class="terminal-header">
+                            <div class="dots"><span></span><span></span><span></span></div>
+                            <span class="terminal-title">Agent Logs</span>
+                        </div>
+                        <div class="terminal-body" id="stream-logs">
+                            <!-- Stream output injected here -->
+                        </div>
+                    </div>
+                    
+                    <div class="infographic-panel glass-panel hidden" id="infographic-container">
+                        <h3>Generated Infographic</h3>
+                        <img id="infographic-img" src="" alt="Infographic" />
+                    </div>
+                    
+                    <div class="text-result-panel glass-panel hidden" id="text-result-container">
+                        <h3 id="text-result-title">Generated Output</h3>
+                        <div class="markdown-content" id="text-result-content"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script type="module" src="app.js"></script>
+</body>
+</html>
