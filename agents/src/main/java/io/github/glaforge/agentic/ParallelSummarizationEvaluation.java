@@ -128,13 +128,13 @@ public class ParallelSummarizationEvaluation {
             .apiKey(System.getenv("GEMINI_API_KEY"))
             .build();
 
-        GoogleAiGeminiChatModel mediumModel = GoogleAiGeminiChatModel.builder()
+            GoogleAiGeminiChatModel mediumModel = GoogleAiGeminiChatModel.builder()
             .modelName("gemini-3-flash-preview")
             .apiKey(System.getenv("GEMINI_API_KEY"))
             .build();
 
         GoogleAiGeminiChatModel smallModel = GoogleAiGeminiChatModel.builder()
-            .modelName("gemini-3.1-flash-lite-preview")
+            .modelName("gemini-3.1-flash-lite")
             .apiKey(System.getenv("GEMINI_API_KEY"))
             .build();
 

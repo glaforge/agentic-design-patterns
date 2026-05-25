@@ -32,7 +32,7 @@ public class ContentSpecialist {
 
         LlmAgent contentCollector = LlmAgent.builder()
             .name("content_collector")
-            .model("gemini-3.1-flash-lite-preview")
+            .model("gemini-3.1-flash-lite")
             .description("Collects content to work on")
             .instruction("""
                 Your role is to collect content to work on.
@@ -43,7 +43,7 @@ public class ContentSpecialist {
 
         LlmAgent topicResearcher = LlmAgent.builder()
             .name("topic_researcher")
-            .model("gemini-3.1-flash-lite-preview")
+            .model("gemini-3.1-flash-lite")
             .description("Researches a topic")
             .instruction("""
                 Your role is to research a given topic and provide a well-structured report.
@@ -55,7 +55,7 @@ public class ContentSpecialist {
 
         LlmAgent summarizer = LlmAgent.builder()
             .name("summarizer")
-            .model("gemini-3.1-flash-lite-preview")
+            .model("gemini-3.1-flash-lite")
             .description("Summarizes content")
             .instruction("""
                 Your role is to summarize content in a concise and accurate way,
@@ -82,7 +82,7 @@ public class ContentSpecialist {
 
         LlmAgent ytShortsCreator = LlmAgent.builder()
             .name("yt_shorts_creator")
-            .model("gemini-3.1-flash-lite-preview")
+            .model("gemini-3.1-flash-lite")
             .description("Creates a YouTube Shorts script from a summarized topic")
             .instruction("""
                 As a YouTube Shorts experienced creator, you create engaging and viral scripts.
