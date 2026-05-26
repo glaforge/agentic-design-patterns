@@ -30,7 +30,8 @@ import dev.langchain4j.skills.ClassPathSkillLoader;
 import dev.langchain4j.skills.FileSystemSkill;
 import dev.langchain4j.skills.Skills;
 import io.github.glaforge.ansiren.MarkdownRenderer;
-import static io.github.glaforge.ansiren.Ansi.*;
+import static io.github.glaforge.ansiren.Ansi.blue;
+import static io.github.glaforge.ansiren.Ansi.green;
 
 public class DraftContent {
 

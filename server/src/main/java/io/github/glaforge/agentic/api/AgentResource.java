@@ -32,6 +32,12 @@ import com.google.genai.types.Blob;
 import java.util.Base64;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.infrastructure.Infrastructure;
+import io.reactivex.rxjava3.disposables.Disposable;
+import com.google.genai.types.Part;
 
 @Path("/api")
 public class AgentResource {
@@ -60,20 +66,20 @@ public class AgentResource {
     @Path("/summarize/stream")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @RestStreamElementType(MediaType.APPLICATION_JSON)
-    @io.smallrye.common.annotation.Blocking
-    public io.smallrye.mutiny.Multi<ParallelSummarizationService.ParallelStreamEventDto> streamSummarize(@QueryParam("url") String url) throws Exception {
+    @Blocking
+    public Multi<ParallelSummarizationService.ParallelStreamEventDto> streamSummarize(@QueryParam("url") String url) throws Exception {
         return parallelSummarizationService.runWorkflow(url)
-            .runSubscriptionOn(io.smallrye.mutiny.infrastructure.Infrastructure.getDefaultWorkerPool());
+            .runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
     }
 
     @GET
     @Path("/specialist/stream")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @RestStreamElementType(MediaType.APPLICATION_JSON)
-    @io.smallrye.common.annotation.Blocking
-    public io.smallrye.mutiny.Multi<ContentSpecialistService.StreamEventDto> streamSpecialist(@QueryParam("url") String url, @QueryParam("goal") String goal) {
-        io.smallrye.mutiny.Multi<ContentSpecialistService.StreamEventDto> stream = io.smallrye.mutiny.Multi.createFrom().emitter(emitter -> {
-            io.reactivex.rxjava3.disposables.Disposable d = contentSpecialistService.runWorkflow(url, goal)
+    @Blocking
+    public Multi<ContentSpecialistService.StreamEventDto> streamSpecialist(@QueryParam("url") String url, @QueryParam("goal") String goal) {
+        Multi<ContentSpecialistService.StreamEventDto> stream = Multi.createFrom().emitter(emitter -> {
+            Disposable d = contentSpecialistService.runWorkflow(url, goal)
                 .subscribe(
                     event -> {
                         String text = "";
@@ -84,13 +90,13 @@ public class AgentResource {
                         if (event.content().isPresent()) {
                             text = event.content().get().text();
                             if (event.content().get().parts().isPresent()) {
-                                for (com.google.genai.types.Part part : event.content().get().parts().get()) {
+                                for (Part part : event.content().get().parts().get()) {
                                     if (part.inlineData().isPresent()) {
                                         Blob blob = part.inlineData().get();
                                         if (blob.data().isPresent()) {
                                             byte[] data = blob.data().get();
                                             infographicMimeType = blob.mimeType().orElse("image/png");
-                                            infographicBase64 = java.util.Base64.getEncoder().encodeToString(data);
+                                            infographicBase64 = Base64.getEncoder().encodeToString(data);
                                             break;
                                         }
                                     }
@@ -100,7 +106,7 @@ public class AgentResource {
 
                         String finalTextResult = null;
                         if (event.actions().stateDelta() != null) {
-                            for (java.util.Map.Entry<String, Object> entry : event.actions().stateDelta().entrySet()) {
+                            for (Map.Entry<String, Object> entry : event.actions().stateDelta().entrySet()) {
                                 if (goal.equals(entry.getKey()) && entry.getValue() instanceof String) {
                                     finalTextResult = (String) entry.getValue();
                                 }
@@ -121,6 +127,6 @@ public class AgentResource {
             
             emitter.onTermination(() -> d.dispose());
         });
-        return stream.runSubscriptionOn(io.smallrye.mutiny.infrastructure.Infrastructure.getDefaultWorkerPool());
+        return stream.runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
     }
 }

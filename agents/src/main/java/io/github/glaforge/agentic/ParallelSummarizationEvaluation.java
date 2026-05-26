@@ -27,7 +27,9 @@ import dev.langchain4j.agentic.declarative.TypedKey;
 import dev.langchain4j.agentic.observability.AgentListener;
 import dev.langchain4j.agentic.observability.AgentResponse;
 import io.github.glaforge.ansiren.MarkdownRenderer;
-import static io.github.glaforge.ansiren.Ansi.*;
+import static io.github.glaforge.ansiren.Ansi.blue;
+import static io.github.glaforge.ansiren.Ansi.green;
+import static io.github.glaforge.ansiren.Ansi.yellow;
 
 import java.net.URI;
 import java.net.http.HttpClient;
