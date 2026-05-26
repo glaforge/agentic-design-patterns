@@ -26,8 +26,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestStreamElementType;
 
-import io.reactivex.rxjava3.core.Flowable;
-import com.google.adk.events.Event;
 import com.google.genai.types.Blob;
 import java.util.Base64;
 import java.util.List;
