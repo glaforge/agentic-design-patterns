@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 comparisonEl.innerHTML += `
                     <div style="margin-bottom: 32px" class="fade-in-up">
                         <span class="badge green-badge">Small Model Comparison</span>
-                        <h3 style="margin: 12px 0;">Preferred Summary: #${data.output.index + 1}</h3>
+                        <h3 style="margin: 12px 0;">Preferred Summary: #${data.output.index}</h3>
                         <div class="markdown-content">${safeRender(data.output.rationale)}</div>
                     </div>
                 `;

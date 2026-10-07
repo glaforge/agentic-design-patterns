@@ -23,6 +23,7 @@ import dev.langchain4j.agentic.planner.AgentInstance;
 import dev.langchain4j.agentic.AgenticServices;
 import dev.langchain4j.agentic.UntypedAgent;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
+import dev.langchain4j.model.output.structured.Description;
 import dev.langchain4j.service.UserMessage;
 import io.smallrye.mutiny.Multi;
 import dev.langchain4j.agentic.declarative.K;
@@ -115,7 +116,10 @@ public class ParallelSummarizationService {
         List<String> summarizeBatch(@K(Articles.class) List<String> articles);
     }
 
-    public record ComparisonResult(int index, String content, String rationale) {
+    public record ComparisonResult(
+            @Description("The 1-based number of the preferred summary (1, 2, or 3)") int index,
+            @Description("The full text content of the preferred summary") String content,
+            @Description("Rationale explaining why this summary is the most accurate") String rationale) {
         @Override
         public String toString() {
             return content;
@@ -131,7 +135,7 @@ public class ParallelSummarizationService {
 
     public interface ComparatorAgent {
         @UserMessage("""
-                You are an expert editor. Below are 3 summaries of the same article:
+                You are an expert editor. Below are 3 summaries of the same article (numbered 1, 2, and 3):
                 <summaries>
                 {{summaries}}
                 </summaries>
@@ -142,7 +146,7 @@ public class ParallelSummarizationService {
                 </article>
 
                 Compare the 3 summaries against the original article.
-                Explain which summary is the most accurate and why.
+                Explain which summary (1, 2, or 3) is the most accurate and why, using 1-based numbering.
                 """)
         @Agent(description = "Compares the summaries against the original article", typedOutputKey = Comparison.class)
         ComparisonResult compareSummaries(@K(Summaries.class) List<String> summaries, @K(Article.class) String article);
