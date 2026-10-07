@@ -120,7 +120,7 @@ public class ContentSpecialist {
             new AgentMetadata("topic_researcher", ImmutableList.of(), "report"),
             new AgentMetadata("summarizer", ImmutableList.of("content", "report"), "summary"),
             new AgentMetadata("infographic_artist", ImmutableList.of("summary"), "infographic"),
-            new AgentMetadata("yt_shorts_creator", ImmutableList.of("summary", "infographic"), "yt_shorts_script")
+            new AgentMetadata("yt_shorts_creator", ImmutableList.of("summary"), "yt_shorts_script")
         );
 
         PlannerAgent agent = PlannerAgent.builder()

@@ -62,7 +62,7 @@ public class DraftService {
         Skills skills = Skills.from(skill);
 
         var modelBuilder = GoogleAiGeminiChatModel.builder()
-                .modelName("gemini-3-flash-preview")
+                .modelName("gemini-3.5-flash-lite")
                 .apiKey(System.getenv("GEMINI_API_KEY"))
                 .sendThinking(true)
                 .returnThinking(true);

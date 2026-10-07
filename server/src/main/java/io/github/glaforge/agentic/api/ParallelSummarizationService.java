@@ -207,7 +207,7 @@ public class ParallelSummarizationService {
                 .build();
 
         GoogleAiGeminiChatModel smallModel = GoogleAiGeminiChatModel.builder()
-                .modelName("gemini-3.1-flash-lite")
+                .modelName("gemini-3.5-flash-lite")
                 .apiKey(System.getenv("GEMINI_API_KEY"))
                 .build();
 

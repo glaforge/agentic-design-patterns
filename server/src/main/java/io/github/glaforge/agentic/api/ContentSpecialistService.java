@@ -46,7 +46,7 @@ public class ContentSpecialistService {
     public Flowable<Event> runWorkflow(String url, String goal) {
         LlmAgent contentCollector = LlmAgent.builder()
                 .name("content_collector")
-                .model("gemini-3.1-flash-lite")
+                .model("gemini-3.5-flash-lite")
                 .description("Collects content to work on")
                 .instruction("""
                         Your role is to collect content to work on.
@@ -57,7 +57,7 @@ public class ContentSpecialistService {
 
         LlmAgent topicResearcher = LlmAgent.builder()
                 .name("topic_researcher")
-                .model("gemini-3.1-flash-lite")
+                .model("gemini-3.5-flash-lite")
                 .description("Researches a topic")
                 .instruction("""
                         Your role is to research a given topic and provide a well-structured report.
@@ -69,7 +69,7 @@ public class ContentSpecialistService {
 
         LlmAgent summarizer = LlmAgent.builder()
                 .name("summarizer")
-                .model("gemini-3.1-flash-lite")
+                .model("gemini-3.5-flash-lite")
                 .description("Summarizes content")
                 .instruction("""
                         Your role is to summarize content in a concise and accurate way,
@@ -86,7 +86,7 @@ public class ContentSpecialistService {
 
         LlmAgent infographicArtist = LlmAgent.builder()
                 .name("infographic_artist")
-                .model("gemini-3.1-flash-image-preview")
+                .model("gemini-nano-banana-2.1")
                 .description("Creates an infographic from content")
                 .instruction("""
                         Your role is to create an infographic from content.
@@ -96,7 +96,7 @@ public class ContentSpecialistService {
 
         LlmAgent ytShortsCreator = LlmAgent.builder()
                 .name("yt_shorts_creator")
-                .model("gemini-3.1-flash-lite")
+                .model("gemini-3.5-flash-lite")
                 .description("Creates a YouTube Shorts script from a summarized topic")
                 .instruction("""
                         As a YouTube Shorts experienced creator, you create engaging and viral scripts.
@@ -112,7 +112,7 @@ public class ContentSpecialistService {
                 new AgentMetadata("topic_researcher", ImmutableList.of(), "report"),
                 new AgentMetadata("summarizer", ImmutableList.of("content", "report"), "summary"),
                 new AgentMetadata("infographic_artist", ImmutableList.of("summary"), "infographic"),
-                new AgentMetadata("yt_shorts_creator", ImmutableList.of("summary", "infographic"), "yt_shorts_script"));
+                new AgentMetadata("yt_shorts_creator", ImmutableList.of("summary"), "yt_shorts_script"));
 
         PlannerAgent agent = PlannerAgent.builder()
                 .name("content_pipeline")
