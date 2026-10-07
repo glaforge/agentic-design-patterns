@@ -33,7 +33,7 @@ import dev.langchain4j.agentic.observability.AgentResponse;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -103,9 +103,9 @@ public class ParallelSummarizationService {
 
     public interface SummarizerAgent {
         @UserMessage("""
-            Provide a comprehensive summary of the following text:
-            {{text}}
-            """)
+                Provide a comprehensive summary of the following text:
+                {{text}}
+                """)
         @Agent(description = "Summarizes the given text", typedOutputKey = Summary.class)
         String summarize(@K(Text.class) String text);
     }
@@ -131,55 +131,55 @@ public class ParallelSummarizationService {
 
     public interface ComparatorAgent {
         @UserMessage("""
-            You are an expert editor. Below are 3 summaries of the same article:
-            <summaries>
-            {{summaries}}
-            </summaries>
-            
-            Here is the original article:
-            <article>
-            {{article}}
-            </article>
-            
-            Compare the 3 summaries against the original article.
-            Explain which summary is the most accurate and why.
-            """)
+                You are an expert editor. Below are 3 summaries of the same article:
+                <summaries>
+                {{summaries}}
+                </summaries>
+
+                Here is the original article:
+                <article>
+                {{article}}
+                </article>
+
+                Compare the 3 summaries against the original article.
+                Explain which summary is the most accurate and why.
+                """)
         @Agent(description = "Compares the summaries against the original article", typedOutputKey = Comparison.class)
         ComparisonResult compareSummaries(@K(Summaries.class) List<String> summaries, @K(Article.class) String article);
     }
 
     public interface BigSummarizerAgent {
         @UserMessage("""
-            Provide a comprehensive, high-quality summary of the following text:
-            {{article}}
-            """)
+                Provide a comprehensive, high-quality summary of the following text:
+                {{article}}
+                """)
         @Agent(description = "Generates a high-quality summary using the big model", typedOutputKey = BigSummary.class)
         String summarizeBig(@K(Article.class) String article);
     }
 
     public interface FinalComparatorAgent {
         @UserMessage("""
-            You are an expert editor. Below are two summaries of the same article.
-            
-            Summary A (Best from small models):
-            <summary_a>
-            {{comparison}}
-            </summary_a>
-            
-            Summary B (From big model):
-            <summary_b>
-            {{big_summary}}
-            </summary_b>
-            
-            Here is the original article:
-            <article>
-            {{article}}
-            </article>
-            
-            Compare the two summaries against the original article.
-            Explain which one is the most accurate and why.
-            You MUST explicitly declare the winner as either SMALL_MODELS or BIG_MODEL.
-            """)
+                You are an expert editor. Below are two summaries of the same article.
+
+                Summary A (Best from small models):
+                <summary_a>
+                {{comparison}}
+                </summary_a>
+
+                Summary B (From big model):
+                <summary_b>
+                {{big_summary}}
+                </summary_b>
+
+                Here is the original article:
+                <article>
+                {{article}}
+                </article>
+
+                Compare the two summaries against the original article.
+                Explain which one is the most accurate and why.
+                You MUST explicitly declare the winner as either SMALL_MODELS or BIG_MODEL.
+                """)
         @Agent(description = "Compares the small model winner with big model summary", typedOutputKey = FinalComparison.class)
         FinalComparisonResult compareFinal(@K(Comparison.class) ComparisonResult comparison,
                 @K(BigSummary.class) String bigSummary, @K(Article.class) String article);
@@ -188,13 +188,13 @@ public class ParallelSummarizationService {
     public record ParallelStreamEventDto(String agentName, Object output) {
     }
 
-    public io.smallrye.mutiny.Multi<ParallelStreamEventDto> runWorkflow(String articleUrl) throws Exception {
+    public Multi<ParallelStreamEventDto> runWorkflow(String articleUrl) throws Exception {
         String markdownConverterUrl = "https://markdown.new/";
         String articleMarkdownUrl = markdownConverterUrl + articleUrl;
 
         var request = HttpRequest.newBuilder(URI.create(articleMarkdownUrl)).build();
         String articleContent = HttpClient.newHttpClient()
-                .send(request, HttpResponse.BodyHandlers.ofString())
+                .send(request, BodyHandlers.ofString())
                 .body();
 
         GoogleAiGeminiChatModel bigModel = GoogleAiGeminiChatModel.builder()
@@ -202,13 +202,8 @@ public class ParallelSummarizationService {
                 .apiKey(System.getenv("GEMINI_API_KEY"))
                 .build();
 
-        GoogleAiGeminiChatModel mediumModel = GoogleAiGeminiChatModel.builder()
-                .modelName("gemini-3-flash-preview")
-                .apiKey(System.getenv("GEMINI_API_KEY"))
-                .build();
-
         GoogleAiGeminiChatModel smallModel = GoogleAiGeminiChatModel.builder()
-                .modelName("gemini-3-flash-preview")
+                .modelName("gemini-3.1-flash-lite")
                 .apiKey(System.getenv("GEMINI_API_KEY"))
                 .build();
 
@@ -222,7 +217,7 @@ public class ParallelSummarizationService {
                 .build();
 
         ComparatorAgent comparatorAgent = AgenticServices.agentBuilder(ComparatorAgent.class)
-                .chatModel(mediumModel)
+                .chatModel(smallModel)
                 .build();
 
         BigSummarizerAgent bigSummarizer = AgenticServices.agentBuilder(BigSummarizerAgent.class)

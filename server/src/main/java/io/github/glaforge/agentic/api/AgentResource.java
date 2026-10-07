@@ -27,15 +27,18 @@ import jakarta.ws.rs.core.MediaType;
 import org.jboss.resteasy.reactive.RestStreamElementType;
 
 import com.google.genai.types.Blob;
-import java.util.Base64;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
+import com.google.genai.types.Part;
+import io.github.glaforge.agentic.api.ContentSpecialistService.StreamEventDto;
+import io.github.glaforge.agentic.api.DraftService.DraftResult;
+import io.github.glaforge.agentic.api.ParallelSummarizationService.ParallelStreamEventDto;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.infrastructure.Infrastructure;
-import io.reactivex.rxjava3.disposables.Disposable;
-import com.google.genai.types.Part;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map.Entry;
 
 @Path("/api")
 public class AgentResource {
@@ -56,7 +59,7 @@ public class AgentResource {
     @Path("/draft")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public DraftService.DraftResult runDraft(TopicRequest request) {
+    public DraftResult runDraft(TopicRequest request) {
         return draftService.runWorkflow(request.topic());
     }
 
@@ -65,7 +68,7 @@ public class AgentResource {
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @RestStreamElementType(MediaType.APPLICATION_JSON)
     @Blocking
-    public Multi<ParallelSummarizationService.ParallelStreamEventDto> streamSummarize(@QueryParam("url") String url) throws Exception {
+    public Multi<ParallelStreamEventDto> streamSummarize(@QueryParam("url") String url) throws Exception {
         return parallelSummarizationService.runWorkflow(url)
             .runSubscriptionOn(Infrastructure.getDefaultWorkerPool());
     }
@@ -75,8 +78,8 @@ public class AgentResource {
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @RestStreamElementType(MediaType.APPLICATION_JSON)
     @Blocking
-    public Multi<ContentSpecialistService.StreamEventDto> streamSpecialist(@QueryParam("url") String url, @QueryParam("goal") String goal) {
-        Multi<ContentSpecialistService.StreamEventDto> stream = Multi.createFrom().emitter(emitter -> {
+    public Multi<StreamEventDto> streamSpecialist(@QueryParam("url") String url, @QueryParam("goal") String goal) {
+        Multi<StreamEventDto> stream = Multi.createFrom().emitter(emitter -> {
             Disposable d = contentSpecialistService.runWorkflow(url, goal)
                 .subscribe(
                     event -> {
@@ -104,7 +107,7 @@ public class AgentResource {
 
                         String finalTextResult = null;
                         if (event.actions().stateDelta() != null) {
-                            for (Map.Entry<String, Object> entry : event.actions().stateDelta().entrySet()) {
+                            for (Entry<String, Object> entry : event.actions().stateDelta().entrySet()) {
                                 if (goal.equals(entry.getKey()) && entry.getValue() instanceof String) {
                                     finalTextResult = (String) entry.getValue();
                                 }
@@ -117,7 +120,7 @@ public class AgentResource {
                             }
                         }
 
-                        emitter.emit(new ContentSpecialistService.StreamEventDto(text, infographicBase64, infographicMimeType, artifacts, finalTextResult));
+                        emitter.emit(new StreamEventDto(text, infographicBase64, infographicMimeType, artifacts, finalTextResult));
                     },
                     error -> emitter.fail(error),
                     () -> emitter.complete()
