@@ -26,7 +26,7 @@ import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import dev.langchain4j.skills.ClassPathSkillLoader;
-import dev.langchain4j.skills.FileSystemSkill;
+import dev.langchain4j.skills.Skill;
 import dev.langchain4j.skills.Skills;
 
 @ApplicationScoped
@@ -58,7 +58,7 @@ public class DraftService {
     }
 
     public DraftResult runWorkflow(String topic) {
-        FileSystemSkill skill = ClassPathSkillLoader.loadSkill("skills/deslopify");
+        Skill skill = ClassPathSkillLoader.loadSkill("skills/deslopify");
         Skills skills = Skills.from(skill);
 
         var modelBuilder = GoogleAiGeminiChatModel.builder()

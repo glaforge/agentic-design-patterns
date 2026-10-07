@@ -18,12 +18,12 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jadk.version>1.1.0</jadk.version>
-        <langchain4j.version>1.13.0</langchain4j.version>
-        <quarkus.platform.version>3.34.3</quarkus.platform.version>
-        <slf4j.version>2.0.17</slf4j.version>
-        <junit.version>6.0.0</junit.version>
-        <ansiren.version>0.1.0</ansiren.version>
+        <jadk.version>1.11.0</jadk.version>
+        <langchain4j.version>1.22.0</langchain4j.version>
+        <quarkus.platform.version>3.40.1</quarkus.platform.version>
+        <slf4j.version>2.0.20</slf4j.version>
+        <junit.version>6.1.3</junit.version>
+        <ansiren.version>0.1.1</ansiren.version>
     </properties>
 
     <dependencyManagement>

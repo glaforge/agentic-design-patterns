@@ -27,7 +27,7 @@ import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 import dev.langchain4j.skills.ClassPathSkillLoader;
-import dev.langchain4j.skills.FileSystemSkill;
+import dev.langchain4j.skills.Skill;
 import dev.langchain4j.skills.Skills;
 import io.github.glaforge.ansiren.MarkdownRenderer;
 import static io.github.glaforge.ansiren.Ansi.blue;
@@ -62,7 +62,7 @@ public class DraftContent {
     public static void main(String[] args) {
         var md = new MarkdownRenderer();
 
-        FileSystemSkill skill = ClassPathSkillLoader.loadSkill("skills/deslopify");
+        Skill skill = ClassPathSkillLoader.loadSkill("skills/deslopify");
         Skills skills = Skills.from(skill);
 
         var modelBuilder = GoogleAiGeminiChatModel.builder()
