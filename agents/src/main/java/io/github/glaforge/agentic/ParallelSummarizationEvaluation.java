@@ -203,7 +203,7 @@ public class ParallelSummarizationEvaluation {
                 .build();
 
         GoogleAiGeminiChatModel smallModel = GoogleAiGeminiChatModel.builder()
-                .modelName("gemini-3.1-flash-lite")
+                .modelName("gemini-3.5-flash-lite")
                 .apiKey(System.getenv("GEMINI_API_KEY"))
                 .build();
 
@@ -211,9 +211,10 @@ public class ParallelSummarizationEvaluation {
                 .chatModel(smallModel)
                 .build();
 
+        var executor = Executors.newFixedThreadPool(3);
         BatchSummarizerAgent batchSummarizer = AgenticServices.parallelMapperBuilder(BatchSummarizerAgent.class)
                 .subAgents(summarizerAgent)
-                .executor(Executors.newFixedThreadPool(3))
+                .executor(executor)
                 .build();
 
         ComparatorAgent comparatorAgent = AgenticServices.agentBuilder(ComparatorAgent.class)
@@ -255,6 +256,7 @@ public class ParallelSummarizationEvaluation {
         var result = evaluationWorkflow.invokeWithAgenticScope(Map.of(
                 "articles", articlesToSummarize,
                 "article", articleContent));
+        executor.shutdown();
 
         List<String> summaries = result.agenticScope().readState(Summaries.class);
         ComparisonResult finalComparison = result.agenticScope().readState(Comparison.class);

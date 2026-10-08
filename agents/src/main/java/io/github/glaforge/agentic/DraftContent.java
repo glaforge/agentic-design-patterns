@@ -36,26 +36,24 @@ import static io.github.glaforge.ansiren.Ansi.green;
 public class DraftContent {
 
     public interface DraftAgent {
-        @Agent(name = "draft_agent",
-                description = "Expert in drafting content.")
+        @Agent(name = "draft_agent", description = "Expert in drafting content.")
         @UserMessage("""
-            Draft content about: {{topic}}
-            Use the `google_search` tool to find relevant information about the requested topic.
-            Write in a super exciting and engaging style, with lots of superlatives and hype!
-            """)
+                Draft content about: {{topic}}
+                Use the `google_search` tool to find relevant information about the requested topic.
+                Write in a super exciting and engaging style, with lots of superlatives and hype!
+                """)
         String draft(@V("topic") String topic);
     }
 
     public interface RefinerAgent {
-        @Agent(name = "refiner_agent",
-                description = "Expert in refining content.")
+        @Agent(name = "refiner_agent", description = "Expert in refining content.")
         @UserMessage("""
-            Deslopify this content:
-            {{draft}}
+                Deslopify this content:
+                {{draft}}
 
-            You have access to the `deslopify` skill.
-            When the user's request relates to one of these skills, activate it first.
-            """)
+                You have access to the `deslopify` skill.
+                When the user's request relates to one of these skills, activate it first.
+                """)
         String refine(@V("draft") String draft);
     }
 
@@ -66,23 +64,24 @@ public class DraftContent {
         Skills skills = Skills.from(skill);
 
         var modelBuilder = GoogleAiGeminiChatModel.builder()
-            .modelName("gemini-3.1-flash-lite-preview")
-            .apiKey(System.getenv("GEMINI_API_KEY"))
-            //.logRequestsAndResponses(true)
-            .sendThinking(true)
-            .returnThinking(true);
+                .modelName("gemini-3.5-flash-lite")
+                .apiKey(System.getenv("GEMINI_API_KEY"))
+                //.logRequestsAndResponses(true)
+                .sendThinking(true)
+                .returnThinking(true);
 
         var model = modelBuilder.build();
 
         var modelWithSearch = modelBuilder
-            .allowGoogleSearch(true)
-            .build();
+                .allowGoogleSearch(true)
+                .build();
 
         AgentListener listener = new AgentListener() {
             @Override
             public void beforeAgentInvocation(AgentRequest agentRequest) {
                 System.out.println(blue("BEFORE ") + agentRequest.agentName() + "\n");
             }
+
             @Override
             public void afterAgentInvocation(AgentResponse agentResponse) {
                 System.out.println(green("AFTER ") + agentResponse.agentName() + "\n");
@@ -90,27 +89,26 @@ public class DraftContent {
         };
 
         var draftAgent = AgenticServices.agentBuilder(DraftAgent.class)
-            .chatModel(modelWithSearch)
-            .listener(listener)
-            .outputKey("draft")
-            .build();
+                .chatModel(modelWithSearch)
+                .listener(listener)
+                .outputKey("draft")
+                .build();
 
         var refinerAgent = AgenticServices.agentBuilder(RefinerAgent.class)
-            .chatModel(model)
-            .toolProviders(skills.toolProvider())
-            .listener(listener)
-            .outputKey("refined")
-            .build();
+                .chatModel(model)
+                .toolProviders(skills.toolProvider())
+                .listener(listener)
+                .outputKey("refined")
+                .build();
 
-       var contentWriter = AgenticServices.sequenceBuilder()
-            .subAgents(draftAgent, refinerAgent)
-            .listener(listener)
-            .outputKey("refined")
-            .build();
+        var contentWriter = AgenticServices.sequenceBuilder()
+                .subAgents(draftAgent, refinerAgent)
+                .listener(listener)
+                .outputKey("refined")
+                .build();
 
         var result = contentWriter.invokeWithAgenticScope(Map.of(
-            "topic", "Latest news in AI from March and April 2026"
-        ));
+                "topic", "Latest news in AI from March and April 2026"));
 
         System.out.println("""
                 ---- DRAFT -------------------
@@ -123,8 +121,7 @@ public class DraftContent {
 
                 ------------------------------
                 """.formatted(
-                    md.render(result.agenticScope().readState("draft").toString()),
-                    md.render(result.agenticScope().readState("refined").toString()))
-                );
+                md.render(result.agenticScope().readState("draft").toString()),
+                md.render(result.agenticScope().readState("refined").toString())));
     }
 }

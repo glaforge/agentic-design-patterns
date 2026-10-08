@@ -215,9 +215,10 @@ public class ParallelSummarizationService {
                 .chatModel(smallModel)
                 .build();
 
+        var executor = Executors.newFixedThreadPool(3);
         BatchSummarizerAgent batchSummarizer = AgenticServices.parallelMapperBuilder(BatchSummarizerAgent.class)
                 .subAgents(summarizerAgent)
-                .executor(Executors.newFixedThreadPool(3))
+                .executor(executor)
                 .build();
 
         ComparatorAgent comparatorAgent = AgenticServices.agentBuilder(ComparatorAgent.class)
@@ -257,6 +258,8 @@ public class ParallelSummarizationService {
                 emitter.complete();
             } catch (Exception e) {
                 emitter.fail(e);
+            } finally {
+                executor.shutdown();
             }
         });
     }
